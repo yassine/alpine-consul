@@ -10,8 +10,8 @@ jobs:
       - docker tag yassine-alpine-consul $DOCKER_USERNAME/alpine-consul:$(cat ./CONSUL_VERSION)
     script:
       - docker run -d --rm --expose 8200 -p 8200:8200 yassine-alpine-consul
-      - wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 10 --post-data='test1' http://localhost:8200/v1/kv/hello -O -
-      - wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 10 --post-data='test1' http://localhost:8200/v1/kv/hello -O - | grep true
+      - wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 10 --post-data='test1' -q --method=POST http://localhost:8200/v1/kv/hello -O -
+      - wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 10 --post-data='test1' -q --method=POST http://localhost:8200/v1/kv/hello -O - | grep true
     after_success:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker push $DOCKER_USERNAME/alpine-consul:$(cat ./CONSUL_VERSION)
