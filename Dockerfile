@@ -24,7 +24,7 @@ RUN apk update \
     && cd $GOPATH/src/github.com/hashicorp \
     && export CONSUL_VERSION=$(cat /etc/VERSION) \
     && git clone --branch $CONSUL_VERSION https://github.com/hashicorp/consul.git \
-    && cd consul
+    && cd consul \
     && make dev \
     && cp bin/consul /bin/consul \
     && addgroup consul \
