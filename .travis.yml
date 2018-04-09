@@ -1,0 +1,28 @@
+language: go
+sudo: required
+services:
+  - docker
+jobs:
+ include:
+  - stage: push_image
+    install:
+      - sudo apt-get install curl
+      - docker build . -t yassine-alpine-consul
+      - docker tag yassine-alpine-consul $DOCKER_USERNAME/alpine-consul:$(cat ./CONSUL_VERSION)
+    script:
+      - docker run --rm --expose 8200 -p 8200:8200 yassine-alpine-consul
+      - curl --max-time 15 --retry 8 -s -X PUT --data 'test1' http://localhost:8200/v1/kv/hello
+      - curl --max-time 15 --retry 8 -s -X PUT --data 'test2' http://localhost:8200/v1/kv/hello | grep true
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker push $DOCKER_USERNAME/alpine-consul:$(cat ./CONSUL_VERSION)
+  - stage: push_latest_image
+    install:
+      - docker build . -t yassine-alpine-consul
+      - docker tag yassine-alpine-consul $DOCKER_USERNAME/alpine-consul:latest
+    script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker push $DOCKER_USERNAME/alpine-consul:latest
+stages:
+  - push_image
+  - name: push_latest_image
+    if: branch = master
