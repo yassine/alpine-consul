@@ -11,8 +11,8 @@ jobs:
       - docker tag yassine-alpine-consul $DOCKER_USERNAME/alpine-consul:$(cat ./CONSUL_VERSION)
     script:
       - docker run -d --rm --expose 8200 -p 8200:8200 yassine-alpine-consul
-      - curl --max-time 15 --retry 8 -s -X PUT --data 'test1' http://localhost:8200/v1/kv/hello
-      - curl --max-time 15 --retry 8 -s -X PUT --data 'test2' http://localhost:8200/v1/kv/hello | grep true
+      - curl --retry-connrefused --max-time 15 --retry 8 -s -X PUT --data 'test1' http://localhost:8200/v1/kv/hello
+      - curl --retry-connrefused --max-time 15 --retry 8 -s -X PUT --data 'test2' http://localhost:8200/v1/kv/hello | grep true
     after_success:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker push $DOCKER_USERNAME/alpine-consul:$(cat ./CONSUL_VERSION)
